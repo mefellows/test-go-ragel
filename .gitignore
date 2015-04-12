@@ -22,3 +22,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
+*.dot
+hg
+test-go-ragel
+*.png

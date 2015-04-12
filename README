@@ -1,0 +1,11 @@
+# Golang Ragel Experiments
+
+Example Lexer written in Go (Based on this [Ruby tutorial](http://thingsaaronmade.com/blog/a-simple-intro-to-writing-a-lexer-with-ragel.html)).
+
+Run me:
+
+```
+./lexer.sh
+```
+
+If Graphviz is installed, it will created and display the associated FSM.
