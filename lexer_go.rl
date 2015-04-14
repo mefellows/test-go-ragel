@@ -2,19 +2,24 @@
 
   machine simple_lexer;
 
-  action print { fmt.Printf("Current mark: %d, fpc: %d", mark, fpc) }
+  action print { fmt.Printf("Current mark: %d, fpc: %d -> %s, fc: %s\n", mark, p, data[mark:p], fc) }
+  action history { fmt.Printf("history match\n") }
+  action sudo { fmt.Printf("sudo match\n") }
+  action copy { fmt.Printf("copy match\n") }
   
-  integer     = ('+'|'-')?[0-9]+ >print;
+  integer     = ('+'|'-')?[0-9]+;
   float       = ('+'|'-')?[0-9]+'.'[0-9]+;
   assignment  = '=';
   identifier  = [a-zA-Z][a-zA-Z_]+; 
+#  command     = ('sudo'|'history'|'copy');
+  command = ('sudo'|'history'|'copy') >print;
   
   gosh := |*
-    
-    integer => { 
-      emit(INTEGER, data, program, ts, te) 
+
+    command any* => {
+      emit(COMMAND, data, program, ts, te) 
     };
-    
+
     float => { 
       emit(FLOAT, data, program, ts, te) 
     };
@@ -25,6 +30,10 @@
     
     identifier => { 
       emit(IDENTIFIER, data, program, ts, te) 
+    };
+    
+    integer => { 
+      emit(INTEGER, data, program, ts, te) 
     };
     
     space;
@@ -40,24 +49,25 @@ import "fmt"
 var cs, p, pe, ts, te, act, eof, mark int
 var program *Program
 
+func reset() {
+  cs, p, pe, ts, te, act, eof, mark = 0,0,0,0,0,0,0,0
+}
 func emit(token_name Token, data []byte, program *Program, ts int, te int) {
   value := string(data[ts:te])
-  fmt.Printf("Inserting statement %v,%v onto array", token_name, value)
   program.append(Statement{Name: token_name, Value: value})
-  fmt.Printf("Program %v", program)
 }
 
 func run_machine(input string) *Program {
+  reset()
   program = NewProgram()
   data := []byte(input)
-  fmt.Printf("Running the state machine with input %v...\n", data)
   pe = len(data)
-  //eof = -1
   eof = len(data)
+  //eof = -1
   %% write init;
   %% write exec;
   
-  fmt.Printf("Finished. The state of the machine is: %s\n", cs)
-  fmt.Printf("p: %s pe: %s\n", p, pe)
+  //fmt.Printf("Finished. The state of the machine is: %s\n", cs)
+  //fmt.Printf("p: %s pe: %s\n", p, pe)
   return program
 }

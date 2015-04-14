@@ -4,6 +4,14 @@ import (
 	"fmt"
 )
 
+type Command int
+
+const (
+	SUDO Command = iota
+	HISTORY
+	COPY
+)
+
 type Program struct {
 	statements []Statement
 }
@@ -24,6 +32,7 @@ const (
 	FLOAT
 	ASSIGNMENT
 	IDENTIFIER
+	COMMAND
 )
 
 type Statement struct {
@@ -39,5 +48,11 @@ func (p *Parser) Parse(input string) {
 
 func main() {
 	program := run_machine("test = -100")
-	fmt.Printf("Program: %v", program)
+	fmt.Printf("Program: %v\n", program)
+
+	program = run_machine("sudo echo foo")
+	fmt.Printf("Program: %v\n", program)
+
+	program = run_machine("sudo")
+	fmt.Printf("Program: %v\n", program)
 }
